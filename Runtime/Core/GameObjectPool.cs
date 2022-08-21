@@ -8,7 +8,7 @@ namespace GameWarriors.PoolDomain.Core
         private Queue<GameObject> _queue;
         private Transform _transformParent;
         private GameObject _objectToPool;
-        public GameObjectPool(int poolCount, GameObject prefab,Transform parent=null)
+        public GameObjectPool(int poolCount, GameObject prefab,Transform parent = null)
         {
             _objectToPool = prefab;
             _transformParent = parent;
@@ -29,7 +29,7 @@ namespace GameWarriors.PoolDomain.Core
 
         public GameObject GetItem()
         {
-            var item = _queue.Count > 0 ? _queue.Dequeue() : Object.Instantiate(_objectToPool, _transformParent, true);
+            GameObject item = _queue.Count > 0 ? _queue.Dequeue() : Object.Instantiate(_objectToPool, _transformParent, true);
             item.SetActive(true);
             return item;
         }

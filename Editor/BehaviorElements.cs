@@ -67,7 +67,7 @@ namespace GameWarriors.PoolDomain.Editor
         public void SaveElement<T>(T input)
         {
             var config = input as PoolManagerConfig;
-            config.SetBehaviorPoolData(_behaviorPool.Where((item) => item.Behavior != null && item.PoolCount > 0)
+            config.SetBehaviorPoolData(_behaviorPool.Where((item) => item.Behavior != null)
                 .ToArray());
         }
 

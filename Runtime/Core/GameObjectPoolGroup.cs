@@ -11,7 +11,7 @@ namespace GameWarriors.PoolDomain.Core
         public void Initialize(ObjectPoolData objectPoolData, Transform gameObjectParent, T key)
         {
             _pool ??= new Dictionary<T, GameObjectPool>();
-            var pool = new GameObjectPool(objectPoolData.PoolCount, objectPoolData.Prefab, gameObjectParent);
+            GameObjectPool pool = new GameObjectPool(objectPoolData.PoolCount, objectPoolData.Prefab, gameObjectParent);
             _pool.Add(key, pool);
         }
 

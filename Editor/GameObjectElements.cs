@@ -48,7 +48,7 @@ namespace GameWarriors.PoolDomain.Editor
         public void SaveElement<T>(T input)
         {
             PoolManagerConfig config = input as PoolManagerConfig;
-            config.SetGameObjectPoolData(_gameObjectsPool.Where((item) => item.Prefab != null && item.PoolCount > 0).ToArray());
+            config.SetGameObjectPoolData(_gameObjectsPool.Where((item) => item.Prefab != null).ToArray());
         }
     }
 }

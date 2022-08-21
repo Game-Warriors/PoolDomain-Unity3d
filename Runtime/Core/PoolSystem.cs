@@ -1,6 +1,7 @@
 ﻿using GameWarriors.PoolDomain.Abstraction;
 using GameWarriors.PoolDomain.Data;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -18,6 +19,12 @@ namespace GameWarriors.PoolDomain.Core
             if (poolResources == null)
                 poolResources = new DefaultResourceLoader();
             poolResources.LoadResourceAsync(PoolManagerConfig.ASSET_NAME, serviceProvider, LoadDone);
+        }
+
+        [UnityEngine.Scripting.Preserve]
+        public IEnumerator WaitForLoadingCoroutine()
+        {
+            yield return new WaitUntil(() => _behaviorPool != null);
         }
 
         [UnityEngine.Scripting.Preserve]
@@ -83,7 +90,7 @@ namespace GameWarriors.PoolDomain.Core
             _gameObjectPool = new GameObjectPoolGroup<string>();
             _behaviorPool = new BehaviorPoolGroup<string>();
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < length; ++i)
             {
                 Component component = config.ComponentPool[i].Component;
                 _componentPoolString.Initialize(config.ComponentPool[i], componentParent, component.gameObject.name);
@@ -91,14 +98,14 @@ namespace GameWarriors.PoolDomain.Core
 
             Transform gameObjectParent = new GameObject("GameObjectPool").transform;
             length = config.ObjectPool.Length;
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < length; ++i)
             {
                 _gameObjectPool.Initialize(config.ObjectPool[i], gameObjectParent, string.Intern(config.ObjectPool[i].Prefab.name));
             }
 
             Transform behaviorParent = new GameObject("BehaviorPool").transform;
             length = config.BehaviorPool.Length;
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < length; ++i)
             {
                 string key = config.BehaviorPool[i].Behavior.gameObject.name;
                 _behaviorPool.Initialize(serviceProvider, config.BehaviorPool[i], behaviorParent, key);

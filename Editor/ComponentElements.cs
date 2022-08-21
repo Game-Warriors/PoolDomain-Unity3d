@@ -53,7 +53,7 @@ namespace GameWarriors.PoolDomain.Editor
         {
             PoolManagerConfig config = input as PoolManagerConfig;
             //List<ComponentPoolData> data = new List<ComponentPoolData>(_componentPool.Count)
-            config.SetComponentsPoolData(_componentPool.Where((item) => item.Component != null && item.PoolCount > 0).ToArray());
+            config.SetComponentsPoolData(_componentPool.Where((item) => item.Component != null).ToArray());
         }
     }
 }
