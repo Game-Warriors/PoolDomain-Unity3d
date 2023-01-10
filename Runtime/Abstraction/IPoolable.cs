@@ -6,8 +6,6 @@ namespace GameWarriors.PoolDomain.Abstraction
     {
         string PoolName { get; }
 
-        void Initialize(IServiceProvider serviceProvider);
-
         /// <summary>
         /// Call when object pop out and get out from pull
         /// </summary>

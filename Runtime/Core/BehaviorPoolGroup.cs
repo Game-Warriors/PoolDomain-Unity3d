@@ -13,21 +13,44 @@ namespace GameWarriors.PoolDomain.Core
     /// <typeparam name="U">Item Type</typeparam>
     public class BehaviorPoolGroup<TV>
     {
-        private Dictionary<TV, BehaviorPool> _pool;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly Dictionary<TV, BehaviorPool> _pool;
+        private readonly Transform _parent;
+        private bool _isInit;
 
-        public void Initialize(IServiceProvider serviceProvider, BehaviourPoolData poolData, Transform parent, TV key)
+        public BehaviorPoolGroup(IServiceProvider serviceProvider, Transform parent)
         {
             _pool ??= new Dictionary<TV, BehaviorPool>();
-            var behaviorPool = new BehaviorPool(serviceProvider,poolData.PoolCount, poolData.Behavior, parent);
+            _serviceProvider = serviceProvider;
+            _parent = parent;
+        }
+
+        public void SetupGroup(BehaviourPoolData poolData, TV key)
+        {
+            var behaviorPool = new BehaviorPool(poolData.PoolCount, poolData.Behavior, _parent);
             _pool.Add(key, behaviorPool);
         }
 
+        public void InitializeBehaviors()
+        {
+            if (!_isInit)
+            {
+                foreach (BehaviorPool item in _pool.Values)
+                {
+                    item.SetupInitializables(_serviceProvider);
+                }
+                _isInit = true;
+            }
+        }
 
         public TU GetItem<TU, T>(TV type) where TU : MonoBehaviour
         {
+            if (!_isInit)
+                InitializeBehaviors();
+
             if (_pool.TryGetValue(type, out var queue))
             {
-                TU item = queue.GetItem<TU>();
+                TU item = queue.GetItem<TU>(_serviceProvider, _parent);
                 IPoolable poolable = item as IPoolable;
                 poolable?.OnPopOut();
                 return item;
@@ -47,9 +70,6 @@ namespace GameWarriors.PoolDomain.Core
             }
             else
                 Debug.LogError($"There is no {type} behavior queue type in poolManager");
-
         }
     }
-
-
 }

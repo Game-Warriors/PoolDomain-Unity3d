@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GameWarriors.PoolDomain.Abstraction
 {
     public interface IPool
     {
+        void SetupBehaviorInitialization();
         T GetGameComponent<T>(string name) where T : Component;
         GameObject GetGameObject(string name);
         T GetGameBehavior<T>(string key) where T : MonoBehaviour;

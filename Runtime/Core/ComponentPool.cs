@@ -7,16 +7,14 @@ namespace GameWarriors.PoolDomain.Core
     {
         private Queue<Component> _queue;
         private Component prefabRef;
-        private Transform _transformParent;
-        
-        public ComponentPool(int poolCount, Component prefab, Transform parent=null)
+
+        public ComponentPool(int poolCount, Component prefab, Transform parent)
         {
-            _transformParent = parent;
             _queue = new Queue<Component>(poolCount);
             prefabRef = prefab;
             for (int i = 0; i < poolCount; ++i)
             {
-                var component = Object.Instantiate(prefab, _transformParent, true);
+                var component = Object.Instantiate(prefab, parent, true);
                 //IPoolable item = component as IPoolable;
                 //if (item != null)
                 //    item.Initialize();
@@ -31,13 +29,13 @@ namespace GameWarriors.PoolDomain.Core
             _queue.Enqueue(item);
         }
 
-        public Component GetItem()
+        public Component GetItem(Transform parent)
         {
-            var item = _queue.Count > 0 ? _queue.Dequeue() : Object.Instantiate(prefabRef, _transformParent, true);
+            var item = _queue.Count > 0 ? _queue.Dequeue() : Object.Instantiate(prefabRef, parent, true);
             return item;
         }
 
-        public T GetItem<T>() where T : Component
+        public T GetItem<T>(Transform parent) where T : Component
         {
             T item;
             if (_queue.Count > 0)
@@ -46,7 +44,7 @@ namespace GameWarriors.PoolDomain.Core
             }
             else
             {
-                item = (T)Object.Instantiate(prefabRef, _transformParent, true);
+                item = (T)Object.Instantiate(prefabRef, parent, true);
             }
             return item;
         }

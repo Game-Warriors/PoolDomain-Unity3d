@@ -6,20 +6,25 @@ namespace GameWarriors.PoolDomain.Core
 {
     public class GameObjectPoolGroup<T>
     {
-        private Dictionary<T, GameObjectPool> _pool;
+        private readonly Dictionary<T, GameObjectPool> _pool;
+        private readonly Transform _parent;
 
-        public void Initialize(ObjectPoolData objectPoolData, Transform gameObjectParent, T key)
+        public GameObjectPoolGroup(Transform parent)
         {
             _pool ??= new Dictionary<T, GameObjectPool>();
-            GameObjectPool pool = new GameObjectPool(objectPoolData.PoolCount, objectPoolData.Prefab, gameObjectParent);
-            _pool.Add(key, pool);
+            _parent = parent;
         }
 
+        public void SetupGroup(ObjectPoolData objectPoolData, T key)
+        {
+            GameObjectPool pool = new GameObjectPool(objectPoolData.PoolCount, objectPoolData.Prefab, _parent);
+            _pool.Add(key, pool);
+        }
 
         public GameObject GetItem(T type)
         {
             if (_pool.TryGetValue(type, out var queue))
-                return queue.GetItem();
+                return queue.GetItem(_parent);
             else
                 Debug.LogError($"There is no {type} gameObject queue type in poolManager");
             return null;

@@ -82,35 +82,39 @@ namespace GameWarriors.PoolDomain.Core
             _componentPoolString.AddItem(key, item);
         }
 
+        public void SetupBehaviorInitialization()
+        {
+            _behaviorPool.InitializeBehaviors();
+        }
+
         private void LoadDone(IServiceProvider serviceProvider, PoolManagerConfig config)
         {
             int length = config.ComponentPool.Length;
             Transform componentParent = new GameObject("ComponentPool").transform;
-            _componentPoolString = new ComponentPoolGroup<string>();
-            _gameObjectPool = new GameObjectPoolGroup<string>();
-            _behaviorPool = new BehaviorPoolGroup<string>();
+            _componentPoolString = new ComponentPoolGroup<string>(componentParent);
 
             for (int i = 0; i < length; ++i)
             {
                 Component component = config.ComponentPool[i].Component;
-                _componentPoolString.Initialize(config.ComponentPool[i], componentParent, component.gameObject.name);
+                _componentPoolString.SetupGroup(config.ComponentPool[i], component.gameObject.name);
             }
 
             Transform gameObjectParent = new GameObject("GameObjectPool").transform;
+            _gameObjectPool = new GameObjectPoolGroup<string>(gameObjectParent);
             length = config.ObjectPool.Length;
             for (int i = 0; i < length; ++i)
             {
-                _gameObjectPool.Initialize(config.ObjectPool[i], gameObjectParent, string.Intern(config.ObjectPool[i].Prefab.name));
+                _gameObjectPool.SetupGroup(config.ObjectPool[i], string.Intern(config.ObjectPool[i].Prefab.name));
             }
 
             Transform behaviorParent = new GameObject("BehaviorPool").transform;
+            _behaviorPool = new BehaviorPoolGroup<string>(serviceProvider, behaviorParent);
             length = config.BehaviorPool.Length;
             for (int i = 0; i < length; ++i)
             {
                 string key = config.BehaviorPool[i].Behavior.gameObject.name;
-                _behaviorPool.Initialize(serviceProvider, config.BehaviorPool[i], behaviorParent, key);
+                _behaviorPool.SetupGroup(config.BehaviorPool[i], key);
             }
         }
-
     }
 }

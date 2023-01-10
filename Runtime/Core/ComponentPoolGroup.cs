@@ -6,23 +6,25 @@ namespace GameWarriors.PoolDomain.Core
 {
     public class ComponentPoolGroup<TV>
     {
-        private Dictionary<TV, ComponentPool> _pool;
+        private readonly Dictionary<TV, ComponentPool> _pool;
+        private readonly Transform _parent;
 
-        public ComponentPoolGroup()
+        public ComponentPoolGroup(Transform parent)
         {
+            _parent = parent;
             _pool = new Dictionary<TV, ComponentPool>();
         }
 
-        public void Initialize(ComponentPoolData poolData, Transform parent, TV key)
+        public void SetupGroup(ComponentPoolData poolData, TV key)
         {
-            ComponentPool componentPool = new ComponentPool(poolData.PoolCount, poolData.Component, parent);
+            ComponentPool componentPool = new ComponentPool(poolData.PoolCount, poolData.Component, _parent);
             _pool.Add(key, componentPool);
         }
 
         public Component GetItem(TV type)
         {
             if (_pool.TryGetValue(type, out var queue))
-                return queue.GetItem();
+                return queue.GetItem(_parent);
             else
                 Debug.LogError($"There is no {type} Component queue type in poolManager");
             return null;
@@ -31,7 +33,7 @@ namespace GameWarriors.PoolDomain.Core
         public T GetItem<T>(TV type) where T : Component
         {
             if (_pool.TryGetValue(type, out var queue))
-                return queue.GetItem<T>();
+                return queue.GetItem<T>(_parent);
             else
                 Debug.LogError($"There is no {type} Component queue type in poolManager");
             return null;
