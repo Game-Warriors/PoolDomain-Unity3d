@@ -1,6 +1,5 @@
 ﻿using GameWarriors.PoolDomain.Abstraction;
 using GameWarriors.PoolDomain.Data;
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -9,31 +8,38 @@ namespace GameWarriors.PoolDomain.Core
 {
     public class PoolSystem : IPool
     {
+        private readonly IBehaviorInitializer<string> _initializer;
+
         private GameObjectPoolGroup<string> _gameObjectPool;
         private BehaviorPoolGroup<string> _behaviorPool;
         private ComponentPoolGroup<string> _componentPoolString;
 
-        [UnityEngine.Scripting.Preserve]
-        public PoolSystem(IServiceProvider serviceProvider, IPoolResources poolResources)
-        {
-            if (poolResources == null)
-                poolResources = new DefaultResourceLoader();
-            poolResources.LoadResourceAsync(PoolManagerConfig.ASSET_NAME, serviceProvider, LoadDone);
-        }
+        private bool IsBehaviorInit { get; set; }
 
         [UnityEngine.Scripting.Preserve]
+        public PoolSystem(IBehaviorInitializer<string> initializer, IPoolResources poolResources)
+        {
+            poolResources ??= new DefaultResourceLoader();
+            _initializer = initializer;
+            poolResources.LoadResourceAsync(PoolManagerConfig.ASSET_NAME, LoadDone);
+        }
+
         public IEnumerator WaitForLoadingCoroutine()
         {
             yield return new WaitUntil(() => _behaviorPool != null);
+            _initializer.Loading(_behaviorPool.ItemsType);
         }
 
-        [UnityEngine.Scripting.Preserve]
         public async Task WaitForLoading()
         {
             while (_behaviorPool == null)
             {
                 await Task.Delay(100);
             }
+            await Task.Run(() =>
+            {
+                _initializer.Loading(_behaviorPool.ItemsType);
+            });
         }
 
         public GameObject GetGameObject(string name)
@@ -45,7 +51,12 @@ namespace GameWarriors.PoolDomain.Core
 
         public T GetGameBehavior<T>(string key) where T : MonoBehaviour
         {
-            T tmp = _behaviorPool.GetItem<T, uint>(key);
+            if (!IsBehaviorInit)
+            {
+                SetupBehaviorInitialization();
+            }
+
+            T tmp = _behaviorPool.GetItem<T, uint>(key, _initializer);
             tmp.gameObject.SetActive(true);
             return tmp;
         }
@@ -84,10 +95,17 @@ namespace GameWarriors.PoolDomain.Core
 
         public void SetupBehaviorInitialization()
         {
-            _behaviorPool.InitializeBehaviors();
+            if (!IsBehaviorInit)
+            {
+                foreach (var item in _behaviorPool.Items)
+                {
+                    _initializer.InitializeBehaviors(item.Key, item.Value.BehaviorItems);
+                }
+                IsBehaviorInit = true;
+            }
         }
 
-        private void LoadDone(IServiceProvider serviceProvider, PoolManagerConfig config)
+        private void LoadDone(PoolManagerConfig config)
         {
             int length = config.ComponentPool.Length;
             Transform componentParent = new GameObject("ComponentPool").transform;
@@ -108,7 +126,7 @@ namespace GameWarriors.PoolDomain.Core
             }
 
             Transform behaviorParent = new GameObject("BehaviorPool").transform;
-            _behaviorPool = new BehaviorPoolGroup<string>(serviceProvider, behaviorParent);
+            _behaviorPool = new BehaviorPoolGroup<string>(behaviorParent);
             length = config.BehaviorPool.Length;
             for (int i = 0; i < length; ++i)
             {

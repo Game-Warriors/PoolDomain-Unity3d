@@ -1,6 +1,7 @@
 ﻿using GameWarriors.PoolDomain.Abstraction;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace GameWarriors.PoolDomain.Core
@@ -8,12 +9,18 @@ namespace GameWarriors.PoolDomain.Core
     public class BehaviorPool
     {
         private Queue<MonoBehaviour> _queue;
-        private MonoBehaviour prefabRef;
-        
+        private MonoBehaviour _prefabRef;
+
+        public IEnumerable<MonoBehaviour> BehaviorItems => _queue;
+
+        public Type ItemType => _prefabRef.GetType();
+
+        public bool CanInject => _prefabRef as IInitializable == null;
+
         public BehaviorPool(int poolCount, MonoBehaviour prefab, Transform parent)
         {
             _queue = new Queue<MonoBehaviour>(poolCount);
-            prefabRef = prefab;
+            _prefabRef = prefab;
             for (int i = 0; i < poolCount; ++i)
             {
                 MonoBehaviour behavior = UnityEngine.Object.Instantiate(prefab, parent, true);
@@ -24,36 +31,26 @@ namespace GameWarriors.PoolDomain.Core
             }
         }
 
-        public void SetupInitializables(IServiceProvider serviceProvider)
-        {
-            foreach (var item in _queue)
-            {
-                IInitializable initializable = item as IInitializable;
-                initializable?.Initialize(serviceProvider);
-            }
-        }
-
         public void AddItem(MonoBehaviour item)
         {
             _queue.Enqueue(item);
         }
 
-        public T GetItem<T>(IServiceProvider serviceProvider, Transform parent) where T : MonoBehaviour
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetItem<T>() where T : MonoBehaviour
         {
-            T item;
+            T item = null;
             if (_queue.Count > 0)
             {
                 item = (T)_queue.Dequeue();
             }
-            else
-            {
-                MonoBehaviour behavior = UnityEngine.Object.Instantiate(prefabRef, parent, true);
-                IInitializable initializable = behavior as IInitializable;
-                initializable?.Initialize(serviceProvider);
-                item = (T)behavior;
-            }
             return item;
         }
 
+        public T CreateItem<T>(Transform parent) where T : MonoBehaviour
+        {
+            MonoBehaviour behavior = UnityEngine.Object.Instantiate(_prefabRef, parent, true);
+            return (T)behavior;
+        }
     }
 }

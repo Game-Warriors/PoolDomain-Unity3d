@@ -76,7 +76,6 @@ namespace GameWarriors.PoolDomain.Editor
                 GUILayout.EndScrollView();
                 Close();
             }
-
         }
 
         private void DrawHorizontalElement(int startVerticalCount, string elementName, int elementCount)

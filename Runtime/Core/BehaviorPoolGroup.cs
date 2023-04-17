@@ -13,15 +13,31 @@ namespace GameWarriors.PoolDomain.Core
     /// <typeparam name="U">Item Type</typeparam>
     public class BehaviorPoolGroup<TV>
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<TV, BehaviorPool> _pool;
         private readonly Transform _parent;
-        private bool _isInit;
+        public int ItemCount => _pool.Count;
 
-        public BehaviorPoolGroup(IServiceProvider serviceProvider, Transform parent)
+        public IDictionary<TV, BehaviorPool> Items => _pool;
+
+        public IEnumerable<(TV, Type)> ItemsType
+        {
+            get
+            {
+                foreach (KeyValuePair<TV, BehaviorPool> item in Items)
+                {
+                    BehaviorPool pool = item.Value;
+                    if (pool.CanInject)
+                        yield return new(item.Key, pool.ItemType);
+                    else
+                        yield return new(item.Key, null);
+                }
+            }
+
+        }
+
+        public BehaviorPoolGroup(Transform parent)
         {
             _pool ??= new Dictionary<TV, BehaviorPool>();
-            _serviceProvider = serviceProvider;
             _parent = parent;
         }
 
@@ -31,32 +47,29 @@ namespace GameWarriors.PoolDomain.Core
             _pool.Add(key, behaviorPool);
         }
 
-        public void InitializeBehaviors()
+        public IEnumerable<MonoBehaviour> GetBehaviorItems(TV key)
         {
-            if (!_isInit)
-            {
-                foreach (BehaviorPool item in _pool.Values)
-                {
-                    item.SetupInitializables(_serviceProvider);
-                }
-                _isInit = true;
-            }
+            if (_pool.TryGetValue(key, out var pool))
+                return pool.BehaviorItems;
+            return null;
         }
 
-        public TU GetItem<TU, T>(TV type) where TU : MonoBehaviour
+        public TU GetItem<TU, T>(TV key, IBehaviorInitializer<TV> initializer) where TU : MonoBehaviour
         {
-            if (!_isInit)
-                InitializeBehaviors();
-
-            if (_pool.TryGetValue(type, out var queue))
+            if (_pool.TryGetValue(key, out var queue))
             {
-                TU item = queue.GetItem<TU>(_serviceProvider, _parent);
+                TU item = queue.GetItem<TU>();
+                if (item == null)
+                {
+                    item = queue.CreateItem<TU>(_parent);
+                    initializer.InitializeBehavior(key, item);
+                }
                 IPoolable poolable = item as IPoolable;
                 poolable?.OnPopOut();
                 return item;
             }
             else
-                Debug.LogError($"There is no {type} behavior queue type in poolManager");
+                Debug.LogError($"There is no {key} behavior queue type in poolManager");
             return null;
         }
 
