@@ -7,10 +7,9 @@ using UnityEngine;
 namespace GameWarriors.PoolDomain.Core
 {
     /// <summary>
-    /// 
+    /// The pool container which is specify for the “MonoBehaviour” derived classes and directly pool by script class reference.
     /// </summary>
-    /// <typeparam name="TV">Item Key</typeparam>
-    /// <typeparam name="U">Item Type</typeparam>
+    /// <typeparam name="TV">Type of key which is unique identifier of the objects</typeparam>
     public class BehaviorPoolGroup<TV>
     {
         private readonly Dictionary<TV, BehaviorPool> _pool;

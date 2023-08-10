@@ -1,10 +1,12 @@
 using GameWarriors.PoolDomain.Abstraction;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace GameWarriors.PoolDomain.Core
 {
+    /// <summary>
+    /// This class apply method call by the polymorphism way, call the "Initialize" method and pass the service provider on the classes which implement "IInitializable" interface.
+    /// </summary>
     public class LocatorInitializer : IBehaviorInitializer<string>
     {
         private readonly IServiceProvider _serviceProvider;

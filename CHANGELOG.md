@@ -1,8 +1,11 @@
+  version : 0.1.4
+  add summary, comment and description on code.
+
   version : 0.1.3
-  add method and property dependency injection feature in mono behavior object pool
+  add method and property dependency injection feature in mono behavior object pool.
 
   version : 0.1.2
-  improve startup and initialization pipeline
+  improve startup and initialization pipeline.
 
   version : 0.1.1
-  add WaitForLoadingCoroutine method to compatible to enumerable service collection
+  add WaitForLoadingCoroutine method to compatible to enumerable service collection.

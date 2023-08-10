@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace GameWarriors.PoolDomain.Core
 {
+    /// <summary>
+    /// This class provide all system feature like loading pool data and setup objects or adding and getting the pool.
+    /// </summary>
     public class PoolSystem : IPool
     {
         private readonly IBehaviorInitializer<string> _initializer;
@@ -19,17 +22,25 @@ namespace GameWarriors.PoolDomain.Core
         [UnityEngine.Scripting.Preserve]
         public PoolSystem(IBehaviorInitializer<string> initializer, IPoolResources poolResources)
         {
-            poolResources ??= new DefaultResourceLoader();
+            poolResources ??= new DefaultPoolResourceLoader();
             _initializer = initializer;
-            poolResources.LoadResourceAsync(PoolManagerConfig.ASSET_NAME, LoadDone);
+            poolResources.LoadResourceAsync(LoadDone);
         }
 
+        /// <summary>
+        /// Wait for loading data from resource loader and then setup system data structure
+        /// </summary>
+        /// <returns>Enumerator which yield till loading process and system setup done</returns>
         public IEnumerator WaitForLoadingCoroutine()
         {
             yield return new WaitUntil(() => _behaviorPool != null);
             _initializer.Loading(_behaviorPool.ItemsType);
         }
 
+        /// <summary>
+        /// Wait for loading data from resource loader and then setup system data structure
+        /// </summary>
+        /// <returns>task which await till all resource loading and system setup done</returns>
         public async Task WaitForLoading()
         {
             while (_behaviorPool == null)
@@ -63,7 +74,7 @@ namespace GameWarriors.PoolDomain.Core
 
         public T GetGameComponent<T>(string name) where T : Component
         {
-            var tmp = (T)_componentPoolString.GetItem(name);
+            T tmp = (T)_componentPoolString.GetItem(name);
             tmp.gameObject.SetActive(true);
             return tmp;
         }

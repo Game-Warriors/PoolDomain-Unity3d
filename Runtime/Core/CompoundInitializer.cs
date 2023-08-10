@@ -4,6 +4,11 @@ using System;
 
 namespace GameWarriors.PoolDomain.Core
 {
+    /// <summary>
+    /// This class apply both method argument injection and method call by the polymorphism. 
+    /// Injecting on unity "MonoBehaviour" driven classes script on specific method by the name "Initialize".
+    /// Call the "Initialize" method and pass the service provider on the classes which implement "IInitializable" interface.
+    /// </summary>
     public class CompondInitializer : IBehaviorInitializer<string>
     {
         private readonly IServiceProvider _serviceProvider;

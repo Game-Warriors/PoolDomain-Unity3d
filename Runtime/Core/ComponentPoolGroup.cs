@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace GameWarriors.PoolDomain.Core
 {
+    /// <summary>
+    /// The pool container which is specify for the component derived classes and directly pool by unity3d component class reference.
+    /// </summary>
+    /// <typeparam name="TV">Type of key which is unique identifier of the objects</typeparam>
     public class ComponentPoolGroup<TV>
     {
         private readonly Dictionary<TV, ComponentPool> _pool;

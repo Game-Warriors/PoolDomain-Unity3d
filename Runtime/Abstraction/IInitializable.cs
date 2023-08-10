@@ -1,6 +1,4 @@
 using System;
-
-
 namespace GameWarriors.PoolDomain.Abstraction
 {
     public interface IInitializable

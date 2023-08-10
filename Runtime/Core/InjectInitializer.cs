@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace GameWarriors.PoolDomain.Core
 {
+    /// <summary>
+    /// This class apply method argument injection on unity "MonoBehaviour" driven classes script on specific method by the name "Initialize"
+    /// </summary>
     public class InjectInitializer : IBehaviorInitializer<string>
     {
         private readonly IServiceProvider _serviceProvider;
