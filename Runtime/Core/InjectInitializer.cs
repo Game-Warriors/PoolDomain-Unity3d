@@ -14,6 +14,7 @@ namespace GameWarriors.PoolDomain.Core
 
         public string MethodName => "Initialize";
 
+        [UnityEngine.Scripting.Preserve]
         public InjectInitializer(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;

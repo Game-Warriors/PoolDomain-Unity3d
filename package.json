@@ -1,6 +1,6 @@
 {
   "name": "com.gamewarriors.poolsystem",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "displayName": "Pool System",
   "description": "This package provide base structure for object pooling functionality include object pool editor assignment",
   "unity": "2019.1",

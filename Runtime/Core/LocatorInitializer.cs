@@ -11,6 +11,7 @@ namespace GameWarriors.PoolDomain.Core
     {
         private readonly IServiceProvider _serviceProvider;
 
+        [UnityEngine.Scripting.Preserve]
         public LocatorInitializer(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
