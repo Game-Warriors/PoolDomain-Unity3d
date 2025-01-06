@@ -1,3 +1,6 @@
+  version : 0.1.6
+  improve editor tools to be compatible with multi asset data, by receiving input asset path in editor window class.
+
   version : 0.1.5
   adding unity preserve attribute to ignore constructors from code stripping.
 

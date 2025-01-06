@@ -15,6 +15,8 @@ namespace GameWarriors.PoolDomain.Editor
         private int _drawCount;
         private PoolManagerConfig _poolConfig;
         private Vector2 scrollPosition;
+        private string _assetPath;
+
         private IPoolElementGroup CurrentElement => _poolElements[_tapIndex];
 
         [MenuItem("Tools/Pool Configuration")]
@@ -24,18 +26,19 @@ namespace GameWarriors.PoolDomain.Editor
                 Directory.CreateDirectory("Assets/AssetData/Resources");
 
             PoolManagerEditor editor = CreateInstance<PoolManagerEditor>();
-            editor.Initialize();
+            editor.Initialize(PoolManagerConfig.ASSET_PATH);
             editor.Show();
         }
 
-        private void Initialize()
+        public void Initialize(string assetPath)
         {
+            _assetPath = assetPath;
             _poolElements = new IPoolElementGroup[3];
-            _poolConfig = AssetDatabase.LoadAssetAtPath<PoolManagerConfig>(PoolManagerConfig.ASSET_PATH);
+            _poolConfig = AssetDatabase.LoadAssetAtPath<PoolManagerConfig>(assetPath);
             if (_poolConfig == null)
             {
                 _poolConfig = CreateInstance<PoolManagerConfig>();
-                AssetDatabase.CreateAsset(_poolConfig, PoolManagerConfig.ASSET_PATH);
+                AssetDatabase.CreateAsset(_poolConfig, assetPath);
             }
 
             _poolElements[0] = new GameObjectElements(_poolConfig.ObjectPool);
@@ -43,8 +46,14 @@ namespace GameWarriors.PoolDomain.Editor
             _poolElements[2] = new BehaviorElements(_poolConfig.BehaviorPool);
             _tapContents = new string[] { _poolElements[0].name + " Pool", _poolElements[1].name + " Pool", _poolElements[2].name + " Pool" };
         }
+
         void OnGUI()
         {
+            if (_assetPath == null)
+            {
+                Close();
+                return;
+            }
             DrawElementView();
         }
 
